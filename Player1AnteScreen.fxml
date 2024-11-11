@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Text?>
+
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.Player1AnteSceneController"
+           prefHeight="700.0" prefWidth="700.0" style="-fx-background-color: black;">
+    <children>
+        <BorderPane>
+            <top>
+                <Text text="PLAYER 1&#10;SET ANTE WAGER" style="-fx-fill: white; -fx-font-size: 50px;" BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <HBox spacing="10.0" alignment="CENTER" BorderPane.alignment="CENTER">
+                    <children>
+                        <Button fx:id="subtractButton" text="  -  " style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+                        <TextField fx:id="anteWagerText" editable="false" style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+                        <Button fx:id="addButton" text="  +  " style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+                    </children>
+                </HBox>
+            </center>
+            <bottom>
+                <Button fx:id="nextButton" text="Place Ante Wager" style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" BorderPane.alignment="CENTER" />
+            </bottom>
+        </BorderPane>
+    </children>
+</StackPane>

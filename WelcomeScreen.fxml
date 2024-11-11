@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.text.Text?>
+
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.WelcomeScreenController"
+           prefHeight="700.0" prefWidth="700.0" style="-fx-background-color: black;">
+    <children>
+        <VBox spacing="20.0" alignment="CENTER">
+            <children>
+                <Text text="WELCOME\n3-Card Poker" style="-fx-fill: white; -fx-font-size: 20px;" />
+                <Button fx:id="playButton" text="PLAY" style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+                <Button fx:id="exitButton" text="EXIT" style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>
