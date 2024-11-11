@@ -1,9 +1,13 @@
 package controllers;
 
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import java.io.IOException;
 
 public class Player1AnteSceneController {
 
@@ -31,10 +35,10 @@ public class Player1AnteSceneController {
             if (anteWagerValue > 5) {
                 anteWagerValue--;
                 anteWagerText.setText("$" + anteWagerValue);
-                addButton.setDisable(false); // Ensure add button is enabled
+                addButton.setDisable(false); // Enable add button
             }
-            if (anteWagerValue <= 5) {
-                subtractButton.setDisable(true); // Disable if it reaches minimum value
+            if (anteWagerValue == 5) {
+                subtractButton.setDisable(true); // Disable if minimum value reached
             }
         });
 
@@ -43,21 +47,26 @@ public class Player1AnteSceneController {
             if (anteWagerValue < 25) {
                 anteWagerValue++;
                 anteWagerText.setText("$" + anteWagerValue);
-                subtractButton.setDisable(false); // Ensure subtract button is enabled
+                subtractButton.setDisable(false); // Enable subtract button
             }
-            if (anteWagerValue >= 25) {
-                addButton.setDisable(true); // Disable if it reaches maximum value
+            if (anteWagerValue == 25) {
+                addButton.setDisable(true); // Disable if maximum value reached
             }
         });
 
         // Configure next button action
         nextButton.setOnAction(event -> {
-            // Here you would navigate to the next scene (e.g., player 2 ante wager scene)
-            // You can pass data to the next scene or handle scene switching logic
-
-            // Example placeholder logic to close the current stage:
-            Stage stage = (Stage) nextButton.getScene().getWindow();
-            stage.close(); // This would need to be replaced with actual scene-switching logic
+            try {
+                // Load the Player 2 Ante Scene FXML
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Player2AnteScreen.fxml"));
+                Parent root = loader.load();
+                Stage stage = (Stage) nextButton.getScene().getWindow();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 }

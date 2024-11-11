@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.Player2AnteSceneController"
+            prefHeight="700.0" prefWidth="700.0"
+            style="-fx-background-color: black;">
+
+    <top>
+        <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Text text="PLAYER 2&#10;SET ANTE WAGER" style="-fx-font-size: 50px; -fx-fill: white;" />
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="10.0" alignment="CENTER">
+            <children>
+                <Button fx:id="subtractButton" text="  -  " style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+                <TextField fx:id="anteWagerText" editable="false" style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+                <Button fx:id="addButton" text="  +  " style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+            </children>
+        </HBox>
+    </center>
+
+    <bottom>
+        <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="finishButton" text="Finish" style="-fx-font-size: 20px; -fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;" />
+            </children>
+        </VBox>
+    </bottom>
+</BorderPane>
