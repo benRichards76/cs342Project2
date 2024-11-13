@@ -7,7 +7,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.GameScreenController"
-            prefHeight="700.0" prefWidth="1000.0"
+            prefHeight="900.0" prefWidth="1000.0"
             style="-fx-background-color: #007059;">
 
     <!-- Top Section (Options Button) -->
@@ -58,6 +58,10 @@
             <!-- Player 2 Section with Wager Info (Top Center) -->
             <HBox alignment="CENTER" spacing="10">
                 <children>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Button fx:id="player2FoldButton" text="Fold" style="-fx-font-size: 16px; -fx-background-color: #d84c73; -fx-text-fill: white;" onAction="#handlePlayer2Fold"/>
+                        <Button fx:id="player2PlayBetButton" text="Play Bet" style="-fx-font-size: 16px; -fx-background-color: #d84c73; -fx-text-fill: white;" onAction="#handlePlayer2PlayBet"/>
+                    </VBox>
                     <VBox fx:id="player2Box" alignment="CENTER" style="-fx-background-color: #d84c73; -fx-padding: 10;" prefWidth="180" prefHeight="100">
                         <children>
                             <Text text="PLAYER 2" style="-fx-font-size: 30px; -fx-fill: white;" />
@@ -104,6 +108,10 @@
             <!-- Player 1 Section with Wager Info (Bottom Center) -->
             <HBox alignment="CENTER" spacing="10">
                 <children>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Button fx:id="player1FoldButton" text="Fold" style="-fx-font-size: 16px; -fx-background-color: #d84c73; -fx-text-fill: white;" onAction="#handlePlayer1Fold"/>
+                        <Button fx:id="player1PlayBetButton" text="Play Bet" style="-fx-font-size: 16px; -fx-background-color: #d84c73; -fx-text-fill: white;" onAction="#handlePlayer1PlayBet"/>
+                    </VBox>
                     <VBox fx:id="player1Box" alignment="CENTER" style="-fx-background-color: #d84c73; -fx-padding: 10;" prefWidth="180" prefHeight="100">
                         <children>
                             <Text text="PLAYER 1" style="-fx-font-size: 30px; -fx-fill: white;" />
