@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.GameSceneController"
+            prefHeight="700.0" prefWidth="1000.0"
+            style="-fx-background-color: #2b7a78;">
+
+    <!-- Top Bar -->
+    <top>
+        <HBox spacing="20.0" style="-fx-background-color: black;" alignment="CENTER_LEFT" prefHeight="40.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="exitButton" text="EXIT" style="-fx-font-size: 15px; -fx-text-fill: black;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="optionsButton" text="OPTIONS" style="-fx-font-size: 15px; -fx-text-fill: black;" />
+            </children>
+        </HBox>
+    </top>
+
+    <!-- Left (Dealer Panel) -->
+    <left>
+        <VBox alignment="CENTER" prefWidth="90.0" style="-fx-background-color: #d84c73;">
+            <children>
+                <Text text="DEALER" style="-fx-font-size: 30px; -fx-fill: white;" rotate="-90.0" />
+            </children>
+        </VBox>
+    </left>
+
+    <!-- Center (Game Board Area) -->
+    <center>
+        <!-- Add content as necessary for the game area -->
+        <Pane fx:id="gameBoardArea" />
+    </center>
+
+    <!-- Bottom (Player 2 Panel) -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #d84c73;" prefHeight="50.0">
+            <children>
+                <Text text="PLAYER 2" style="-fx-font-size: 30px; -fx-fill: white;" />
+            </children>
+        </HBox>
+    </bottom>
+
+    <!-- Right (Wager Info) -->
+    <right>
+        <VBox spacing="20.0" alignment="TOP_RIGHT" BorderPane.alignment="TOP_RIGHT">
+            <children>
+                <VBox spacing="10.0" style="-fx-background-color: black;" padding="10.0" prefHeight="150.0">
+                    <children>
+                        <Text text="WAGER INFO" style="-fx-font-size: 20px; -fx-fill: white;" />
+                        <Text fx:id="anteInfo" text="ANTE: $" style="-fx-font-size: 16px; -fx-fill: white;" />
+                        <Text fx:id="pairPlusInfo" text="PAIR PLUS: $" style="-fx-font-size: 16px; -fx-fill: white;" />
+                        <Text fx:id="playWagerInfo" text="PLAY WAGER: $" style="-fx-font-size: 16px; -fx-fill: white;" />
+                    </children>
+                </VBox>
+                <VBox spacing="10.0" style="-fx-background-color: black;" padding="10.0" prefHeight="150.0">
+                    <children>
+                        <Text text="WAGER INFO" style="-fx-font-size: 20px; -fx-fill: white;" />
+                        <Text fx:id="anteInfo2" text="ANTE: $" style="-fx-font-size: 16px; -fx-fill: white;" />
+                        <Text fx:id="pairPlusInfo2" text="PAIR PLUS: $" style="-fx-font-size: 16px; -fx-fill: white;" />
+                        <Text fx:id="playWagerInfo2" text="PLAY WAGER: $" style="-fx-font-size: 16px; -fx-fill: white;" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </right>
+</BorderPane>
+
+        <!--<?xml version="1.0" encoding="UTF-8"?>-->
+
+<!--<?import java.lang.*?>-->
+<!--<?import java.util.*?>-->
+<!--<?import javafx.scene.*?>-->
+<!--<?import javafx.scene.control.*?>-->
+<!--<?import javafx.scene.layout.*?>-->
+
+<!--<AnchorPane xmlns="http://javafx.com/javafx"-->
+<!--            xmlns:fx="http://javafx.com/fxml"-->
+<!--            fx:controller="views.GameScene"-->
+<!--            prefHeight="400.0" prefWidth="600.0">-->
+
+<!--</AnchorPane>-->
