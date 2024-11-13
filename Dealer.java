@@ -1,6 +1,6 @@
-package GameLogic;
-
+package main.java;
 import java.util.ArrayList;
+
 
 public class Dealer {
     private Deck theDeck;
@@ -12,21 +12,22 @@ public class Dealer {
     }
 
     public ArrayList<Card> dealHand() {
-        dealersHand.clear();
+//        dealersHand.clear();
         // Add three cards from theDeck to dealersHand
-        for (int i = 0; i < 3; i++) {
-            if (!theDeck.isEmpty()) {
-                dealersHand.add(theDeck.remove(0));
-            }
+        ArrayList<Card> hand = new ArrayList<>();
+        if (theDeck.size() <= 34) {
+            theDeck = new Deck();
         }
-//        System.out.println(theDeck.size());
-//        dealersHand.add(new Card('H', 3));
-        return dealersHand;
+        for (int i = 0; i < 3; i++) {
+            hand.add(theDeck.remove(0));
+        }
+//        System.out.println(hand);
+        return hand;
     }
 
     public void printDealerDeck(ArrayList<Card> decks) {
         for (Card card : decks) {
-            System.out.println(card.getSuit() + " " + card.getValue());
+            System.out.println(card.getSuit() + "-" + card.getValue());
         }
     }
 
@@ -36,6 +37,14 @@ public class Dealer {
 
     public int getSize() {
         return theDeck.size();
+    }
+
+    public void setHand(ArrayList<Card> hand) {
+        dealersHand = hand;
+    }
+
+    public ArrayList<Card> getHand() {
+        return dealersHand;
     }
 
 
