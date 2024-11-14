@@ -61,7 +61,7 @@ public class ThreeCardLogic {
             PairPlusWinning = bet + (3 * bet);
         }
         else if (handValue == 5) { // Pair Plus winnings for a pair hand
-            PairPlusWinning = bet + bet;
+            PairPlusWinning = bet;
         }
 
 
