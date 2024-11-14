@@ -34,9 +34,9 @@ public class Deck extends ArrayList<Card> {
         }
     }
 
-    public int getDeckSize() {
-        return deckOfCards.size();
-    }
+//    public int getDeckSize() {
+//        return deckOfCards.size();
+//    }
 
     public ArrayList<Card> getDeck() {
         return deckOfCards;
