@@ -120,14 +120,20 @@ public class GameScreenController {
                 TextInputDialog player1PairPlusDialog = new TextInputDialog();
                 player1PairPlusDialog.setTitle("Player 1 Pair Plus Wager");
                 player1PairPlusDialog.setHeaderText(null);
-                player1PairPlusDialog.setContentText("Enter Player 1 Pair Plus (optional, between $0 and $25):");
+                player1PairPlusDialog.setContentText("Enter Player 1 Pair Plus (optional, between $5 and $25):");
 
                 Optional<String> player1PairPlusResult = player1PairPlusDialog.showAndWait();
-                if (player1PairPlusResult.isPresent() && isValidWager(player1PairPlusResult.get(), 0, 25)) {
-                    setPairPlusWager(player1PairPlusResult.get());
-                } else if (player1PairPlusResult.isPresent()) {
-                    showAlert("Invalid pair plus wager for Player 1. Please enter a value between $0 and $25.");
-                    return; // Stop if invalid
+                if (player1PairPlusResult.isPresent()) {
+                    String result = player1PairPlusResult.get();
+                    if (isValidWager(result, 5, 25)) {
+                        setPairPlusWager(result);
+                    } else {
+                        showAlert("Invalid pair plus wager for Player 1. Please enter a value between $5 and $25.");
+                        return; // Stop if invalid
+                    }
+                } else {
+                    // If the dialog is cancelled, set the wager to 0
+                    setPairPlusWager("0");
                 }
             }
 
@@ -149,14 +155,20 @@ public class GameScreenController {
                 TextInputDialog player2PairPlusDialog = new TextInputDialog();
                 player2PairPlusDialog.setTitle("Player 2 Pair Plus Wager");
                 player2PairPlusDialog.setHeaderText(null);
-                player2PairPlusDialog.setContentText("Enter Player 2 Pair Plus (optional, between $0 and $25):");
+                player2PairPlusDialog.setContentText("Enter Player 2 Pair Plus (optional, between $5 and $25):");
 
                 Optional<String> player2PairPlusResult = player2PairPlusDialog.showAndWait();
-                if (player2PairPlusResult.isPresent() && isValidWager(player2PairPlusResult.get(), 0, 25)) {
-                    setPlayer2PairPlusWager(player2PairPlusResult.get());
-                } else if (player2PairPlusResult.isPresent()) {
-                    showAlert("Invalid pair plus wager for Player 2. Please enter a value between $0 and $25.");
-                    return; // Stop if invalid
+                if (player2PairPlusResult.isPresent()) {
+                    String result = player2PairPlusResult.get();
+                    if (isValidWager(result, 5, 25)) {
+                        setPlayer2PairPlusWager(result);
+                    } else {
+                        showAlert("Invalid pair plus wager for Player 2. Please enter a value between $5 and $25.");
+                        return; // Stop if invalid
+                    }
+                } else {
+                    // If the dialog is cancelled, set the wager to 0
+                    setPlayer2PairPlusWager("0");
                 }
             }
 
@@ -358,8 +370,8 @@ public class GameScreenController {
                 else {
                     showInfo("Player 1 loses Pair Plus"); // here
                 }
-                
-                
+
+
                 p1Result = threeCardLogic.compareHands(dealer.getHand(), player1.getHand());
                 System.out.println(combo + "before adding ante and play bet x2");
                 combo = (player1.getAnteBet() + player1.getPlayBet()) * 2;
@@ -402,8 +414,8 @@ public class GameScreenController {
                 else {
                     showInfo("Player 2 loses Pair Plus"); // here
                 }
-                
-                
+
+
                 p2Result = threeCardLogic.compareHands(dealer.getHand(), player2.getHand());
                 System.out.println(combo + "before adding ante and play bet x2");
                 combo = (player2.getAnteBet() + player2.getPlayBet()) * 2;
