@@ -1,6 +1,6 @@
-package main.java;
-import java.util.ArrayList;
+package GameLogic;
 
+import java.util.ArrayList;
 
 public class Dealer {
     private Deck theDeck;
