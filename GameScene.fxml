@@ -108,5 +108,16 @@
         anteInfo2.setText("ANTE: $");
         pairPlusInfo2.setText("PAIR PLUS: $");
         playWagerInfo2.setText("PLAY WAGER: $");
+
+        // Clear card images
+        player1Card1Image.setImage(null);
+        player1Card2Image.setImage(null);
+        player1Card3Image.setImage(null);
+        player2Card1Image.setImage(null);
+        player2Card2Image.setImage(null);
+        player2Card3Image.setImage(null);
+        dealerCard1Image.setImage(null);
+        dealerCard2Image.setImage(null);
+        dealerCard3Image.setImage(null);
     }
 
