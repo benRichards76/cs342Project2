@@ -49,16 +49,16 @@ public class ThreeCardLogic {
         int PairPlusWinning = 0;
 
         if (handValue == 1) { // Pair Plus winnings for a Straight flush hand
-            PairPlusWinning = bet + (40 * bet);
+            PairPlusWinning = (40 * bet);
         }
         else if (handValue == 2) { // Pair Plus winnings for a Three of a Kind hand
-            PairPlusWinning = bet + (30 * bet);
+            PairPlusWinning = (30 * bet);
         }
         else if (handValue == 3) { // Pair Plus winnings for a Straight hand
-            PairPlusWinning = bet + (6 * bet);
+            PairPlusWinning = (6 * bet);
         }
         else if (handValue == 4) { // Pair Plus winnings for a Flush hand
-            PairPlusWinning = bet + (3 * bet);
+            PairPlusWinning = (3 * bet);
         }
         else if (handValue == 5) { // Pair Plus winnings for a pair hand
             PairPlusWinning = bet;
@@ -79,7 +79,7 @@ public class ThreeCardLogic {
             for (int i = 0; i < dealer.size(); i++) {
                 if (dealer.get(i).getValue() > player.get(i).getValue()) {
                     return 1; // Dealer wins
-                } 
+                }
                 else if (dealer.get(i).getValue() < player.get(i).getValue()) {
                     return 2; // Player wins
                 }
