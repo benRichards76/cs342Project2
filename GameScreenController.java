@@ -1,5 +1,4 @@
 package controllers;
-
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,19 +26,16 @@ import main.java.ThreeCardLogic;
 
 public class GameScreenController {
 
-    // Buttons and UI elements for controlling game actions
     @FXML private Button exitButton, optionsButton, freshStartButton, newLookButton, placeBetsButton;
     @FXML private Button player1FoldButton, player2FoldButton, player1PlayBetButton, player2PlayBetButton;
     @FXML private VBox optionsPane;
-    @FXML private Text anteInfo, pairPlusInfo, playWagerInfo;       // Player 1 wager info
-    @FXML private Text anteInfo2, pairPlusInfo2, playWagerInfo2;    // Player 2 wager info
+    @FXML private Text anteInfo, pairPlusInfo, playWagerInfo;       // Text fields for Player 1's wager info
+    @FXML private Text anteInfo2, pairPlusInfo2, playWagerInfo2;   // Text fields for Player 2's wager info
     @FXML private Text player1Winnings, player2Winnings;
     @FXML private ImageView player1Card1Image, player1Card2Image, player1Card3Image;
     @FXML private ImageView player2Card1Image, player2Card2Image, player2Card3Image;
     @FXML private ImageView dealerCard1Image, dealerCard2Image, dealerCard3Image;
     @FXML private ImageView deckCardImage;
-
-    // Game state variables
     private boolean isNewLookEnabled = false;
     private boolean betsPlaced = false;
     private boolean player1Folded = false;
@@ -66,7 +62,6 @@ public class GameScreenController {
     @FXML
     public void initialize() {
         try {
-            // Set up button actions
             optionsButton.setOnAction(event -> toggleOptionsPane());
             newLookButton.setOnAction(event -> handleNewLook());
             exitButton.setOnAction(event -> handleExit());
@@ -77,12 +72,12 @@ public class GameScreenController {
             player1PlayBetButton.setOnAction(event -> handlePlayer1PlayBet());
             player2PlayBetButton.setOnAction(event -> handlePlayer2PlayBet());
 
-            // Initialize player and dealer
+            // Initialize player and dealer instances once
             dealer = new Dealer();
             player1 = new Player();
             player2 = new Player();
 
-            // Disable fold and play buttons initially
+            // Disable fold and play buttons until bets are placed and cards are dealt
             player1FoldButton.setDisable(true);
             player2FoldButton.setDisable(true);
             player1PlayBetButton.setDisable(true);
@@ -90,10 +85,10 @@ public class GameScreenController {
 
         } catch (Exception e) {
             e.printStackTrace();
+            // Handle any exceptions during setup to prevent crashes
         }
     }
 
-    // Handle bet placement for both players
     @FXML
     private void handlePlaceBets() {
         try {
@@ -101,26 +96,29 @@ public class GameScreenController {
             player2Folded = false;
             player1Played = false;
             player2Played = false;
-
-            // Prompt Player 1 for wagers
+            // Player 1 Wager Input Dialogs
             if (!p1NextHand) {
                 if (nextAnte1) {
                     TextInputDialog player1AnteDialog = new TextInputDialog();
                     player1AnteDialog.setTitle("Player 1 Ante Wager");
+                    player1AnteDialog.setHeaderText(null);
                     player1AnteDialog.setContentText("Enter Player 1 Ante (between $5 and $25):");
+
                     Optional<String> player1AnteResult = player1AnteDialog.showAndWait();
                     if (player1AnteResult.isPresent() && isValidWager(player1AnteResult.get(), 5, 25)) {
                         setAnteWager(player1AnteResult.get());
                     } else {
                         showAlert("Invalid ante wager for Player 1. Please enter a value between $5 and $25.");
-                        return;
+                        return; // Stop if invalid
                     }
                 }
 
-                // Pair Plus wager (optional)
+
                 TextInputDialog player1PairPlusDialog = new TextInputDialog();
                 player1PairPlusDialog.setTitle("Player 1 Pair Plus Wager");
+                player1PairPlusDialog.setHeaderText(null);
                 player1PairPlusDialog.setContentText("Enter Player 1 Pair Plus (optional, between $5 and $25):");
+
                 Optional<String> player1PairPlusResult = player1PairPlusDialog.showAndWait();
                 if (player1PairPlusResult.isPresent()) {
                     String result = player1PairPlusResult.get();
@@ -128,32 +126,37 @@ public class GameScreenController {
                         setPairPlusWager(result);
                     } else {
                         showAlert("Invalid pair plus wager for Player 1. Please enter a value between $5 and $25.");
-                        return;
+                        return; // Stop if invalid
                     }
                 } else {
+                    // If the dialog is cancelled, set the wager to 0
                     setPairPlusWager("0");
                 }
             }
 
-            // Prompt Player 2 for wagers
+            // Player 2 Wager Input Dialogs
             if (!p2NextHand) {
                 if (nextAnte2) {
                     TextInputDialog player2AnteDialog = new TextInputDialog();
                     player2AnteDialog.setTitle("Player 2 Ante Wager");
+                    player2AnteDialog.setHeaderText(null);
                     player2AnteDialog.setContentText("Enter Player 2 Ante (between $5 and $25):");
+
                     Optional<String> player2AnteResult = player2AnteDialog.showAndWait();
                     if (player2AnteResult.isPresent() && isValidWager(player2AnteResult.get(), 5, 25)) {
                         setPlayer2AnteWager(player2AnteResult.get());
                     } else {
                         showAlert("Invalid ante wager for Player 2. Please enter a value between $5 and $25.");
-                        return;
+                        return; // Stop if invalid
                     }
                 }
 
-                // Pair Plus wager (optional)
+
                 TextInputDialog player2PairPlusDialog = new TextInputDialog();
                 player2PairPlusDialog.setTitle("Player 2 Pair Plus Wager");
+                player2PairPlusDialog.setHeaderText(null);
                 player2PairPlusDialog.setContentText("Enter Player 2 Pair Plus (optional, between $5 and $25):");
+
                 Optional<String> player2PairPlusResult = player2PairPlusDialog.showAndWait();
                 if (player2PairPlusResult.isPresent()) {
                     String result = player2PairPlusResult.get();
@@ -161,16 +164,19 @@ public class GameScreenController {
                         setPlayer2PairPlusWager(result);
                     } else {
                         showAlert("Invalid pair plus wager for Player 2. Please enter a value between $5 and $25.");
-                        return;
+                        return; // Stop if invalid
                     }
                 } else {
+                    // If the dialog is cancelled, set the wager to 0
                     setPlayer2PairPlusWager("0");
                 }
             }
 
-            // Enable fold and play buttons
+            // Mark bets as placed and start dealing cards
             betsPlaced = true;
             dealCards();
+
+            // Enable fold and play buttons after bets are placed and cards are dealt
             player1FoldButton.setDisable(false);
             player2FoldButton.setDisable(false);
             player1PlayBetButton.setDisable(false);
@@ -182,72 +188,70 @@ public class GameScreenController {
         }
     }
 
-    // Handle fold action for Player 1
     @FXML
     private void handlePlayer1Fold() {
         player1Folded = true;
         p1NextHand = false;
+        nextAnte1 = true;
         resetWagers1();
         player1FoldButton.setDisable(true);
         player1PlayBetButton.setDisable(true);
-        showInfo("Player 1 has folded.");
+        showInfo("Player 1 has folded."); // here
         checkAllActionsCompleted();
     }
 
-    // Handle fold action for Player 2
     @FXML
     private void handlePlayer2Fold() {
         player2Folded = true;
         p2NextHand = false;
+        nextAnte2 = true;
         resetWagers2();
         player2FoldButton.setDisable(true);
         player2PlayBetButton.setDisable(true);
-        showInfo("Player 2 has folded.");
+        showInfo("Player 2 has folded."); // here
         checkAllActionsCompleted();
     }
 
-    // Handle play bet action for Player 1
     @FXML
     private void handlePlayer1PlayBet() {
         if (player1Folded) {
-            showInfo("Player 1 has folded and cannot place a play bet.");
+            showInfo("Player 1 has folded and cannot place a play bet."); // here
             return;
         }
-        // Set Player 1's play wager to match ante
+
+        // Set Player 1's play wager to be equal to their ante wager
         String anteWager = anteInfo.getText().replace("ANTE: ", "");
         setPlayWager(anteWager);
         player1FoldButton.setDisable(true);
         player1PlayBetButton.setDisable(true);
         player1Played = true;
-        showInfo("Player 1's play wager set to ante: " + anteWager);
+        showInfo("Player 1's play wager has been set to the ante wager: " + anteWager); // here
         checkAllActionsCompleted();
     }
 
-    // Handle play bet action for Player 2
     @FXML
     private void handlePlayer2PlayBet() {
         if (player2Folded) {
-            showInfo("Player 2 has folded and cannot place a play bet.");
+            showInfo("Player 2 has folded and cannot place a play bet."); // here
             return;
         }
-        // Set Player 2's play wager to match ante
+
+        // Set Player 2's play wager to be equal to their ante wager
         String anteWager = anteInfo2.getText().replace("ANTE: ", "");
         setPlayer2PlayWager(anteWager);
         player2FoldButton.setDisable(true);
         player2PlayBetButton.setDisable(true);
         player2Played = true;
-        showInfo("Player 2's play wager set to ante: " + anteWager);
+        showInfo("Player 2's play wager has been set to the ante wager: " + anteWager); // here
         checkAllActionsCompleted();
     }
 
-    // Check if both players have finished their actions
     private void checkAllActionsCompleted() {
         if ((player1Folded || player1Played) && (player2Folded || player2Played)) {
             evaluateDealerHand();
         }
     }
 
-    // Validate wager input
     private boolean isValidWager(String wager, int min, int max) {
         try {
             int value = Integer.parseInt(wager);
@@ -257,20 +261,26 @@ public class GameScreenController {
         }
     }
 
-    // Deal cards to each player and the dealer
     private void dealCards() {
         if (!betsPlaced) {
-            System.out.println("Place bets before dealing cards.");
+            System.out.println("Please place bets before dealing cards.");
             return;
         }
-        // Deal hands to players and dealer
+
+        // Re-deal hands for each new round
         dealer.setHand(dealer.dealHand());
-        if (!player1Folded) player1.setHand(dealer.dealHand());
-        if (!player2Folded) player2.setHand(dealer.dealHand());
+        for (Card card : dealer.getHand()) {
+            System.out.println(card.getValue());
+        }
+        if (!player1Folded) {
+            player1.setHand(dealer.dealHand());
+        }
+        if (!player2Folded) {
+            player2.setHand(dealer.dealHand());
+        }
 
         try {
             setupCardImage(deckCardImage, "/deckOfCards/BackOfCard.png");
-            // Animated card deal for each player and dealer
             if (!player1Folded) {
                 animateCardDeal(deckCardImage, player1Card1Image, "/deckOfCards/" + player1.getHand().get(0) + ".png", 0);
                 animateCardDeal(deckCardImage, player1Card2Image, "/deckOfCards/" + player1.getHand().get(1) + ".png", 1500);
@@ -289,8 +299,11 @@ public class GameScreenController {
         }
     }
 
-    // Evaluate the dealer's hand against each player
+
     private void evaluateDealerHand() {
+        String player1EvalString;
+        String player2EvalString;
+
         ThreeCardLogic threeCardLogic = new ThreeCardLogic();
         String wager = "0";
 
@@ -301,73 +314,106 @@ public class GameScreenController {
         threeCardLogic.callSort(dealer.getHand());
 
         // Check if dealer qualifies
-        boolean dealerQualifies = dealer.getHand().get(0).getValue() >= 19; // Queen high or better
+        boolean dealerQualifies = dealer.getHand().get(0).getValue() >= 12; // Queen high or better
 
-        // Evaluate and display result for Player 1
+        // Handle Player 1 evaluation
         if (!player1Folded) {
+            // Evaluate Pair Plus
             int pairPlusWinnings = threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet());
+            if (pairPlusWinnings > 0) {
+                showInfo("Player 1 wins Pair Plus");
+            } else if (player1.getPairPlusBet() > 0) {
+                showInfo("Player 1 loses Pair Plus");
+            }
             setTotalWinnings(player1Winnings, String.valueOf(pairPlusWinnings), player1);
+
             if (!dealerQualifies) {
-                String playWager = playWagerInfo.getText().replace("PLAY WAGER: ", "");
-                setTotalWinnings(player1Winnings, playWager, player1);
+                // Dealer does not qualify: return play wager and push ante bet
                 nextAnte1 = false;
                 setPairPlusWager(wager);
-                setPlayWager(wager);
+                setPlayWager(wager); // we chose to not add it to winnings because it is said the play wager is returned, so you don't "win" more money
                 showInfo("Dealer does not qualify. Player 1's play wager is returned, and the ante is pushed.");
             } else {
-                // Compare hands
+                nextAnte1 = true;
+                // Dealer qualifies: compare hands
                 int p1Result = threeCardLogic.compareHands(dealer.getHand(), player1.getHand());
-                int playAndAnteWinnings = (player1.getAnteBet() + player1.getPlayBet()) * 2;
+                int playAndAnteWinnings = player1.getAnteBet() + player1.getPlayBet(); // Play and Ante payout
+
                 if (p1Result == 1) {
-                    showInfo("Player 1 loses to dealer");
+                    // Dealer wins
+                    player1EvalString = "Player 1 loses to dealer";
+                    showInfo(player1EvalString);
                     resetWagers1();
                 } else if (p1Result == 2) {
-                    showInfo("Player 1 beats dealer");
+                    // Player wins
+                    player1EvalString = "Player 1 beats dealer";
+                    showInfo(player1EvalString);
                     resetWagers1();
                     setTotalWinnings(player1Winnings, String.valueOf(playAndAnteWinnings), player1);
-                } else {
-                    showInfo("Player 1 ties dealer");
+                } else if (p1Result == 0) {
+                    // Tie
+                    player1EvalString = "Player 1 ties dealer";
+                    showInfo(player1EvalString);
+                    // Ante and Play bets are pushed, no changes needed
                 }
             }
         }
 
-        // Evaluate and display result for Player 2 (similar to Player 1)
+        // Handle Player 2 evaluation
         if (!player2Folded) {
+            // Evaluate Pair Plus
             int pairPlusWinnings = threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet());
+            if (pairPlusWinnings > 0) {
+                showInfo("Player 2 wins Pair Plus");
+            } else if (player2.getPairPlusBet() > 0) {
+                showInfo("Player 2 loses Pair Plus");
+            }
             setTotalWinnings(player2Winnings, String.valueOf(pairPlusWinnings), player2);
+
             if (!dealerQualifies) {
-                String playWager2 = playWagerInfo2.getText().replace("PLAY WAGER: ", "");
-                setTotalWinnings(player2Winnings, playWager2, player2);
+                // Dealer does not qualify: return play wager and push ante bet
                 nextAnte2 = false;
                 setPlayer2PairPlusWager(wager);
-                setPlayer2PlayWager(wager);
+                setPlayer2PlayWager(wager); // we chose to not add it to winnings because it is said the play wager is returned, so you don't "win" more money
                 showInfo("Dealer does not qualify. Player 2's play wager is returned, and the ante is pushed.");
             } else {
-                // Compare hands
+                // Dealer qualifies: compare hands
+                nextAnte2 = true;
                 int p2Result = threeCardLogic.compareHands(dealer.getHand(), player2.getHand());
-                int playAndAnteWinnings = (player2.getAnteBet() + player2.getPlayBet()) * 2;
+                int playAndAnteWinnings = player2.getAnteBet() + player2.getPlayBet(); // Play and Ante payout
+
                 if (p2Result == 1) {
-                    showInfo("Player 2 loses to dealer");
+                    // Dealer wins
+                    player2EvalString = "Player 2 loses to dealer";
+                    showInfo(player2EvalString);
                     resetWagers2();
                 } else if (p2Result == 2) {
-                    showInfo("Player 2 beats dealer");
+                    // Player wins
+                    player2EvalString = "Player 2 beats dealer";
+                    showInfo(player2EvalString);
                     resetWagers2();
                     setTotalWinnings(player2Winnings, String.valueOf(playAndAnteWinnings), player2);
-                } else {
-                    showInfo("Player 2 ties dealer");
+                } else if (p2Result == 0) {
+                    // Tie
+                    player2EvalString = "Player 2 ties dealer";
+                    showInfo(player2EvalString);
+                    // Ante and Play bets are pushed, no changes needed
                 }
             }
         }
 
-        showInfo("Press Place Bets button in top left to start new hand");
+        showInfo("Press Place Bets button in top right to start new hand");
     }
+    
 
     @FXML
     private void setupCardImage(ImageView imageView, String imagePath) {
         Image cardImage = null;
         try {
             cardImage = new Image(getClass().getResourceAsStream(imagePath));
-            if (cardImage.isError()) throw new IOException("Unable to load image from path: " + imagePath);
+            if (cardImage.isError()) {
+                throw new IOException("Unable to load image from path: " + imagePath);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -382,17 +428,23 @@ public class GameScreenController {
     private void animateCardDeal(ImageView deckCard, ImageView targetCard, String targetImagePath, int delay) {
         TranslateTransition transition = new TranslateTransition();
         transition.setNode(deckCard);
-        transition.setDuration(Duration.millis(500));
-        transition.setDelay(Duration.millis(delay));
+        transition.setDuration(Duration.millis(500)); // Animation duration in milliseconds
+        transition.setDelay(Duration.millis(delay)); // Delay before the animation starts
+
+        // Calculate the target position for the animation
         double targetX = targetCard.getLayoutX() - deckCard.getLayoutX();
         double targetY = targetCard.getLayoutY() - deckCard.getLayoutY();
+
         transition.setByX(targetX);
         transition.setByY(targetY);
+
         transition.setOnFinished(event -> {
+            // Set the final card image on the target after the animation ends
             setupCardImage(targetCard, targetImagePath);
             deckCard.setTranslateX(0);
             deckCard.setTranslateY(0);
         });
+
         transition.play();
     }
 
@@ -430,12 +482,22 @@ public class GameScreenController {
 
     @FXML
     private void handleFreshStart() {
-        // Reset game state and UI elements
+        // Reset game state if necessary
+        player1 = new Player();
+        player2 = new Player();
+        dealer = new Dealer();
         player1Folded = false;
         player2Folded = false;
         player1Played = false;
         player2Played = false;
         betsPlaced = false;
+        nextAnte1 = true;
+        nextAnte2 = true;
+        currentWinnings = 0;
+        playWagerAmount = 0;
+        updatedWinnings = 0;
+        p1NextHand = false;
+        p2NextHand = false;
         player1FoldButton.setDisable(true);
         player2FoldButton.setDisable(true);
         player1PlayBetButton.setDisable(true);
@@ -448,8 +510,6 @@ public class GameScreenController {
         anteInfo2.setText("ANTE: $");
         pairPlusInfo2.setText("PAIR PLUS: $");
         playWagerInfo2.setText("PLAY WAGER: $");
-
-        // Clear card images
         player1Card1Image.setImage(null);
         player1Card2Image.setImage(null);
         player1Card3Image.setImage(null);
@@ -459,6 +519,7 @@ public class GameScreenController {
         dealerCard1Image.setImage(null);
         dealerCard2Image.setImage(null);
         dealerCard3Image.setImage(null);
+        showInfo("Game reset, press Place Bets button in top right to start new hand");
     }
 
     private void showInfo(String message) {
@@ -473,106 +534,71 @@ public class GameScreenController {
         alert.showAndWait();
     }
 
-    /**
-     * Sets Player 1's Ante wager and updates the UI.
-     * @param wager The ante wager amount for Player 1
-     */
+    // Set Player 1's Ante wager value
     public void setAnteWager(String wager) {
         int p1Ante = Integer.parseInt(wager);
         player1.setAnteBet(p1Ante);
         anteInfo.setText("ANTE: " + wager);
     }
 
-    /**
-     * Sets Player 1's Pair Plus wager and updates the UI.
-     * @param wager The Pair Plus wager amount for Player 1
-     */
+    // Set Player 1's Pair Plus wager value
     public void setPairPlusWager(String wager) {
         int p1Pair = Integer.parseInt(wager);
         player1.setPairPlusBet(p1Pair);
         pairPlusInfo.setText("PAIR PLUS: " + wager);
     }
 
-    /**
-     * Sets Player 1's Play wager and updates the UI.
-     * @param wager The play wager amount for Player 1
-     */
+    // Set Player 1's Play wager value
     public void setPlayWager(String wager) {
         int p1Play = Integer.parseInt(wager);
         player1.setPlayBet(p1Play);
         playWagerInfo.setText("PLAY WAGER: " + wager);
     }
 
-    /**
-     * Sets Player 2's Ante wager and updates the UI.
-     * @param wager The ante wager amount for Player 2
-     */
+    // Set Player 2's Ante wager value
     public void setPlayer2AnteWager(String wager) {
         int p2Ante = Integer.parseInt(wager);
         player2.setAnteBet(p2Ante);
         anteInfo2.setText("ANTE: " + wager);
     }
 
-    /**
-     * Sets Player 2's Pair Plus wager and updates the UI.
-     * @param wager The Pair Plus wager amount for Player 2
-     */
+    // Set Player 2's Pair Plus wager value
     public void setPlayer2PairPlusWager(String wager) {
         int p2Pair = Integer.parseInt(wager);
         player2.setPairPlusBet(p2Pair);
         pairPlusInfo2.setText("PAIR PLUS: " + wager);
     }
 
-    /**
-     * Sets Player 2's Play wager and updates the UI.
-     * @param wager The play wager amount for Player 2
-     */
+    // Set Player 2's Play wager value
     public void setPlayer2PlayWager(String wager) {
         int p2Play = Integer.parseInt(wager);
         player2.setPlayBet(p2Play);
         playWagerInfo2.setText("PLAY WAGER: " + wager);
     }
 
-    /**
-     * Updates the total winnings for a player and updates the UI.
-     * @param playerWinningsText Text element showing the total winnings
-     * @param wager The amount won in the latest round
-     * @param player The player whose winnings are updated
-     */
     public void setTotalWinnings(Text playerWinningsText, String wager, Player player) {
         currentWinnings = Integer.parseInt(playerWinningsText.getText().replace("Total Winnings: $", ""));
         playWagerAmount = Integer.parseInt(wager);
         updatedWinnings = currentWinnings + playWagerAmount;
-        player.addWinnings(updatedWinnings);
+        player.addWinnings(playWagerAmount);
         playerWinningsText.setText("Total Winnings: $" + updatedWinnings);
     }
 
-    /**
-     * Displays an information message after a delay.
-     * @param message The message to display
-     * @param delayInSeconds The delay before displaying the message
-     */
     private void showInfoAfterDelay(String message, int delayInSeconds) {
         PauseTransition pause = new PauseTransition(Duration.seconds(delayInSeconds));
         pause.setOnFinished(event -> showInfo(message));
         pause.play();
     }
 
-    /**
-     * Resets all wager values for Player 1 to 0.
-     */
     private void resetWagers1() {
         setAnteWager("0");
         setPairPlusWager("0");
         setPlayWager("0");
     }
 
-    /**
-     * Resets all wager values for Player 2 to 0.
-     */
     private void resetWagers2() {
         setPlayer2AnteWager("0");
         setPlayer2PairPlusWager("0");
-        setPlayWager("0");
+        setPlayer2PlayWager("0");
     }
 }
