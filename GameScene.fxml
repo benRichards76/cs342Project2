@@ -85,3 +85,28 @@
 <!--            prefHeight="400.0" prefWidth="600.0">-->
 
 <!--</AnchorPane>-->
+
+
+
+@FXML
+    private void handleFreshStart() {
+        // Reset game state if necessary
+        player1Folded = false;
+        player2Folded = false;
+        player1Played = false;
+        player2Played = false;
+        betsPlaced = false;
+        player1FoldButton.setDisable(true);
+        player2FoldButton.setDisable(true);
+        player1PlayBetButton.setDisable(true);
+        player2PlayBetButton.setDisable(true);
+        player1Winnings.setText("Total Winnings: $0");
+        player2Winnings.setText("Total Winnings: $0");
+        anteInfo.setText("ANTE: $");
+        pairPlusInfo.setText("PAIR PLUS: $");
+        playWagerInfo.setText("PLAY WAGER: $");
+        anteInfo2.setText("ANTE: $");
+        pairPlusInfo2.setText("PAIR PLUS: $");
+        playWagerInfo2.setText("PLAY WAGER: $");
+    }
+
