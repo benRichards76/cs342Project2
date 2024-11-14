@@ -64,6 +64,7 @@ public class ThreeCardLogic {
             PairPlusWinning = bet + bet;
         }
 
+
         return PairPlusWinning;
     }
 
@@ -90,6 +91,10 @@ public class ThreeCardLogic {
         else if (dealerHand < playerHand && dealerHand != 0) {
             return 1;
         }
+        else if (dealerHand > playerHand && playerHand == 0) {
+            return 1;
+        }
+
 
         return 2;
     }
