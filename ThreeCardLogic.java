@@ -76,17 +76,15 @@ public class ThreeCardLogic {
             sortCardsByRank(dealer);
             sortCardsByRank(player);
 
-            if (dealerHand == playerHand) {
-                if (dealer.get(0).getValue() > player.get(0).getValue()) {
-                    return 1;
-                }
-                else if (dealer.get(0).getValue() < player.get(0).getValue()) {
-                    return 2;
-                }
-                else if (dealer.get(0).getValue() == player.get(0).getValue()) {
-                    return 0;
+            for (int i = 0; i < dealer.size(); i++) {
+                if (dealer.get(i).getValue() > player.get(i).getValue()) {
+                    return 1; // Dealer wins
+                } 
+                else if (dealer.get(i).getValue() < player.get(i).getValue()) {
+                    return 2; // Player wins
                 }
             }
+            return 0;
         }
         else if (dealerHand < playerHand && dealerHand != 0) {
             return 1;
