@@ -47,6 +47,8 @@ public class GameScreenController {
     private int updatedWinnings = 0;
     private boolean p1NextHand = false;
     private boolean p2NextHand = false;
+    private boolean nextAnte1 = true;
+    private boolean nextAnte2 = true;
 
     // Player and Dealer instances
     private Player player1;
@@ -104,18 +106,21 @@ public class GameScreenController {
 //            System.out.println(p1NextHand + " player 1 next hand");
 //            System.out.println(p2NextHand + " player 2 next hand");
             if (!p1NextHand) {
-                TextInputDialog player1AnteDialog = new TextInputDialog();
-                player1AnteDialog.setTitle("Player 1 Ante Wager");
-                player1AnteDialog.setHeaderText(null);
-                player1AnteDialog.setContentText("Enter Player 1 Ante (between $5 and $25):");
+                if (nextAnte1) {
+                    TextInputDialog player1AnteDialog = new TextInputDialog();
+                    player1AnteDialog.setTitle("Player 1 Ante Wager");
+                    player1AnteDialog.setHeaderText(null);
+                    player1AnteDialog.setContentText("Enter Player 1 Ante (between $5 and $25):");
 
-                Optional<String> player1AnteResult = player1AnteDialog.showAndWait();
-                if (player1AnteResult.isPresent() && isValidWager(player1AnteResult.get(), 5, 25)) {
-                    setAnteWager(player1AnteResult.get());
-                } else {
-                    showAlert("Invalid ante wager for Player 1. Please enter a value between $5 and $25.");
-                    return; // Stop if invalid
+                    Optional<String> player1AnteResult = player1AnteDialog.showAndWait();
+                    if (player1AnteResult.isPresent() && isValidWager(player1AnteResult.get(), 5, 25)) {
+                        setAnteWager(player1AnteResult.get());
+                    } else {
+                        showAlert("Invalid ante wager for Player 1. Please enter a value between $5 and $25.");
+                        return; // Stop if invalid
+                    }
                 }
+
 
                 TextInputDialog player1PairPlusDialog = new TextInputDialog();
                 player1PairPlusDialog.setTitle("Player 1 Pair Plus Wager");
@@ -139,18 +144,21 @@ public class GameScreenController {
 
             // Player 2 Wager Input Dialogs
             if (!p2NextHand) {
-                TextInputDialog player2AnteDialog = new TextInputDialog();
-                player2AnteDialog.setTitle("Player 2 Ante Wager");
-                player2AnteDialog.setHeaderText(null);
-                player2AnteDialog.setContentText("Enter Player 2 Ante (between $5 and $25):");
+                if (nextAnte2) {
+                    TextInputDialog player2AnteDialog = new TextInputDialog();
+                    player2AnteDialog.setTitle("Player 2 Ante Wager");
+                    player2AnteDialog.setHeaderText(null);
+                    player2AnteDialog.setContentText("Enter Player 2 Ante (between $5 and $25):");
 
-                Optional<String> player2AnteResult = player2AnteDialog.showAndWait();
-                if (player2AnteResult.isPresent() && isValidWager(player2AnteResult.get(), 5, 25)) {
-                    setPlayer2AnteWager(player2AnteResult.get());
-                } else {
-                    showAlert("Invalid ante wager for Player 2. Please enter a value between $5 and $25.");
-                    return; // Stop if invalid
+                    Optional<String> player2AnteResult = player2AnteDialog.showAndWait();
+                    if (player2AnteResult.isPresent() && isValidWager(player2AnteResult.get(), 5, 25)) {
+                        setPlayer2AnteWager(player2AnteResult.get());
+                    } else {
+                        showAlert("Invalid ante wager for Player 2. Please enter a value between $5 and $25.");
+                        return; // Stop if invalid
+                    }
                 }
+
 
                 TextInputDialog player2PairPlusDialog = new TextInputDialog();
                 player2PairPlusDialog.setTitle("Player 2 Pair Plus Wager");
@@ -312,7 +320,7 @@ public class GameScreenController {
         threeCardLogic.callSort(dealer.getHand());
 
         // Check if dealer qualifies
-        boolean dealerQualifies = dealer.getHand().get(0).getValue() >= 12; // Queen high or better
+        boolean dealerQualifies = dealer.getHand().get(0).getValue() >= 19; // Queen high or better
 
         // Handle Player 1 evaluation
         if (!player1Folded) {
@@ -329,7 +337,9 @@ public class GameScreenController {
                 // Dealer does not qualify: return play wager and push ante bet
                 String playWager = playWagerInfo.getText().replace("PLAY WAGER: ", "");
                 setTotalWinnings(player1Winnings, playWager, player1);
-                resetWagers1();
+                nextAnte1 = false;
+                setPairPlusWager(wager);
+                setPlayWager(wager);
                 showInfo("Dealer does not qualify. Player 1's play wager is returned, and the ante is pushed.");
             } else {
                 // Dealer qualifies: compare hands
@@ -371,7 +381,9 @@ public class GameScreenController {
                 // Dealer does not qualify: return play wager and push ante bet
                 String playWager2 = playWagerInfo2.getText().replace("PLAY WAGER: ", "");
                 setTotalWinnings(player2Winnings, playWager2, player2);
-                resetWagers2();
+                nextAnte2 = false;
+                setPlayer2PairPlusWager(wager);
+                setPlayer2PlayWager(wager);
                 showInfo("Dealer does not qualify. Player 2's play wager is returned, and the ante is pushed.");
             } else {
                 // Dealer qualifies: compare hands
