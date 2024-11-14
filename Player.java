@@ -28,7 +28,7 @@ public class Player {
 
 
     public ArrayList<Card> getHand() {
-        return hand;
+        return this.hand;
     }
 
     public void setHand(ArrayList<Card> hand) {
@@ -65,5 +65,9 @@ public class Player {
 
     public void setTotalWinnings(int totalWinnings) {
         this.totalWinnings = totalWinnings;
+    }
+
+    public void addWinnings(int winnings) {
+        this.totalWinnings += winnings;
     }
 }
