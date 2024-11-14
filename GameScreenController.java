@@ -192,9 +192,7 @@ public class GameScreenController {
     private void handlePlayer1Fold() {
         player1Folded = true;
         p1NextHand = false;
-        setAnteWager("0");
-        setPairPlusWager("0");
-        setPlayWager("0");
+        resetWagers1();
         player1FoldButton.setDisable(true);
         player1PlayBetButton.setDisable(true);
         showInfo("Player 1 has folded."); // here
@@ -205,9 +203,7 @@ public class GameScreenController {
     private void handlePlayer2Fold() {
         player2Folded = true;
         p2NextHand = false;
-        setPlayer2AnteWager("0");
-        setPlayer2PairPlusWager("0");
-        setPlayer2PlayWager("0");
+        resetWagers2();
         player2FoldButton.setDisable(true);
         player2PlayBetButton.setDisable(true);
         showInfo("Player 2 has folded."); // here
@@ -301,166 +297,271 @@ public class GameScreenController {
         }
     }
 
+
     private void evaluateDealerHand() {
         String player1EvalString;
         String player2EvalString;
-        String player1PPString;
-        String player2PPString;
 
         ThreeCardLogic threeCardLogic = new ThreeCardLogic();
         String wager = "0";
 
+        // Reveal dealer cards
         animateCardDeal(deckCardImage, dealerCard1Image, "/deckOfCards/" + dealer.getHand().get(0) + ".png", 0);
         animateCardDeal(deckCardImage, dealerCard2Image, "/deckOfCards/" + dealer.getHand().get(1) + ".png", 0);
         animateCardDeal(deckCardImage, dealerCard3Image, "/deckOfCards/" + dealer.getHand().get(2) + ".png", 0);
         threeCardLogic.callSort(dealer.getHand());
-//        for (Card card : dealer.getHand()) {
-//            System.out.println(card);
-//        }
-//        System.out.println(dealer.getTheDeck().size());
-        if (dealer.getHand().get(0).getValue() < 12) {
-            if (!player1Folded) {
-                p1NextHand = true;
-            }
-            if (!player2Folded) {
-                p2NextHand = true;
-            }
 
-//            System.out.println("dealer less than queen");
-            // Dealer does not qualify, return play wagers and push ante bets
-            if (!player1Folded) {
-                setTotalWinnings(player2Winnings, String.valueOf(threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet())), player1);
-                if (threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet()) != 0) {
-                    showInfo("Player 1 wins Pair Plus"); // here
-                }
-                else {
-                    showInfo("Player 1 loses Pair Plus"); // here
-                }
+        // Check if dealer qualifies
+        boolean dealerQualifies = dealer.getHand().get(0).getValue() >= 12; // Queen high or better
+
+        // Handle Player 1 evaluation
+        if (!player1Folded) {
+            // Evaluate Pair Plus
+            int pairPlusWinnings = threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet());
+            if (pairPlusWinnings > 0) {
+                showInfo("Player 1 wins Pair Plus");
+            } else if (player1.getPairPlusBet() > 0) {
+                showInfo("Player 1 loses Pair Plus");
+            }
+            setTotalWinnings(player1Winnings, String.valueOf(pairPlusWinnings), player1);
+
+            if (!dealerQualifies) {
+                // Dealer does not qualify: return play wager and push ante bet
                 String playWager = playWagerInfo.getText().replace("PLAY WAGER: ", "");
                 setTotalWinnings(player1Winnings, playWager, player1);
-                setPlayWager(wager);
-                showInfo("Dealer does not qualify. Player 1's play wager is returned, and the ante is pushed."); // here
+                resetWagers1();
+                showInfo("Dealer does not qualify. Player 1's play wager is returned, and the ante is pushed.");
+            } else {
+                // Dealer qualifies: compare hands
+                int p1Result = threeCardLogic.compareHands(dealer.getHand(), player1.getHand());
+                int playAndAnteWinnings = (player1.getAnteBet() + player1.getPlayBet()) * 2; // Play and Ante payout
+
+                if (p1Result == 1) {
+                    // Dealer wins
+                    player1EvalString = "Player 1 loses to dealer";
+                    showInfo(player1EvalString);
+                    resetWagers1();
+                } else if (p1Result == 2) {
+                    // Player wins
+                    player1EvalString = "Player 1 beats dealer";
+                    showInfo(player1EvalString);
+                    resetWagers1();
+                    setTotalWinnings(player1Winnings, String.valueOf(playAndAnteWinnings), player1);
+                } else if (p1Result == 0) {
+                    // Tie
+                    player1EvalString = "Player 1 ties dealer";
+                    showInfo(player1EvalString);
+                    // Ante and Play bets are pushed, no changes needed
+                }
             }
-            if (!player2Folded) {
-                if (threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet()) != 0) {
-                    showInfo("Player 2 wins Pair Plus"); // here
-                }
-                else {
-                    showInfo("Player 2 loses Pair Plus"); // here
-                }
-                setTotalWinnings(player2Winnings, String.valueOf(threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet())), player2);
+        }
+
+        // Handle Player 2 evaluation
+        if (!player2Folded) {
+            // Evaluate Pair Plus
+            int pairPlusWinnings = threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet());
+            if (pairPlusWinnings > 0) {
+                showInfo("Player 2 wins Pair Plus");
+            } else if (player2.getPairPlusBet() > 0) {
+                showInfo("Player 2 loses Pair Plus");
+            }
+            setTotalWinnings(player2Winnings, String.valueOf(pairPlusWinnings), player2);
+
+            if (!dealerQualifies) {
+                // Dealer does not qualify: return play wager and push ante bet
                 String playWager2 = playWagerInfo2.getText().replace("PLAY WAGER: ", "");
                 setTotalWinnings(player2Winnings, playWager2, player2);
-                setPlayer2PlayWager(wager);
-                showInfo("Dealer does not qualify. Player 2's play wager is returned, and the ante is pushed."); // here
-            }
-//            dealCards();
-        }
-        else {
-            p1NextHand = false;
-            p2NextHand = false;
-            int p1Result;
-            int p2Result;
-            int combo = 0;
-
-            if (!player1Folded) {
-                if (threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet()) != 0) {
-                    showInfo("Player 1 wins Pair Plus"); // here
-                }
-                else {
-                    showInfo("Player 1 loses Pair Plus"); // here
-                }
-
-
-                p1Result = threeCardLogic.compareHands(dealer.getHand(), player1.getHand());
-                System.out.println(combo + "before adding ante and play bet x2");
-                combo = (player1.getAnteBet() + player1.getPlayBet()) * 2;
-                System.out.println(combo + "after adding ante and play bet x2");
-                combo += threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet());
-                System.out.println(combo + "after adding PP");
-                if (p1Result == 1) {
-//                    if (player1.getPairPlusBet() != 0) {
-//                        player1PPString = "Player 1 loses Pair Plus";
-//                        showInfo(player1PPString); // here
-//                    }
-                    player1EvalString = "Player 1 loses to dealer";
-                    showInfo(player1EvalString); // here
-                    setAnteWager(wager);
-                    setPairPlusWager(wager);
-                    setPlayWager(wager);
-                }
-                else if (p1Result == 2) {
-//                    if (player1.getPairPlusBet() != 0) {
-//                        player1PPString = "Player 1 wins Pair Plus";
-//                        showInfo(player1PPString); // here
-//                    }
-                    player1EvalString = "Player 1 beats dealer";
-                    showInfo(player1EvalString); // here
-                    setAnteWager(wager);
-                    setPairPlusWager(wager);
-                    setPlayWager(wager);
-                    setTotalWinnings(player1Winnings, String.valueOf(combo), player1);
-                }
-                else if (p1Result == 0) {
-                    p1NextHand = true;
-                    player1EvalString = "Player 1 ties dealer, wagers passed to next hand";
-                    showInfo(player1EvalString); // here
-                }
-            }
-            if (!player2Folded) {
-                if (threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet()) != 0) {
-                    showInfo("Player 2 wins Pair Plus"); // here
-                }
-                else {
-                    showInfo("Player 2 loses Pair Plus"); // here
-                }
-
-
-                p2Result = threeCardLogic.compareHands(dealer.getHand(), player2.getHand());
-                System.out.println(combo + "before adding ante and play bet x2");
-                combo = (player2.getAnteBet() + player2.getPlayBet()) * 2;
-                System.out.println(combo + "after adding ante and play bet x2");
-                combo += threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet());
-                System.out.println(combo + "after adding PP");
+                resetWagers2();
+                showInfo("Dealer does not qualify. Player 2's play wager is returned, and the ante is pushed.");
+            } else {
+                // Dealer qualifies: compare hands
+                int p2Result = threeCardLogic.compareHands(dealer.getHand(), player2.getHand());
+                int playAndAnteWinnings = (player2.getAnteBet() + player2.getPlayBet()) * 2; // Play and Ante payout
 
                 if (p2Result == 1) {
-//                    if (player2.getPairPlusBet() != 0) {
-//                        player2PPString = "Player 2 loses Pair Plus";
-//                        showInfo(player2PPString); // here
-//                    }
+                    // Dealer wins
                     player2EvalString = "Player 2 loses to dealer";
-                    showInfo(player2EvalString); // here
-                    setPlayer2AnteWager(wager);
-                    setPlayer2PairPlusWager(wager);
-                    setPlayer2PlayWager(wager);
-                }
-                else if (p2Result == 2) {
-//                    if (player2.getPairPlusBet() != 0) {
-//                        player2PPString = "Player 2 wins Pair Plus";
-//                        showInfo(player2PPString); // here
-//                    }
+                    showInfo(player2EvalString);
+                    resetWagers2();
+                } else if (p2Result == 2) {
+                    // Player wins
                     player2EvalString = "Player 2 beats dealer";
-                    showInfo(player2EvalString); // here
-                    setPlayer2AnteWager(wager);
-                    setPlayer2PairPlusWager(wager);
-                    setPlayer2PlayWager(wager);
-                    setTotalWinnings(player2Winnings, String.valueOf(combo), player2);
+                    showInfo(player2EvalString);
+                    resetWagers2();
+                    setTotalWinnings(player2Winnings, String.valueOf(playAndAnteWinnings), player2);
+                } else if (p2Result == 0) {
+                    // Tie
+                    player2EvalString = "Player 2 ties dealer";
+                    showInfo(player2EvalString);
+                    // Ante and Play bets are pushed, no changes needed
                 }
-                else if (p2Result == 0) {
-                    p2NextHand = true;
-                    player2EvalString = "Player 2 ties dealer, wagers passed to next hand";
-                    showInfo(player2EvalString); // here
-                }
-
             }
-
-            // Dealer qualifies, continue with game logic
-            // TODO: Implement further game logic to compare hands and determine winners/losers
-
         }
-        showInfo("Press Place Bets button in top left to start new hand"); // here
 
+        showInfo("Press Place Bets button in top left to start new hand");
     }
+
+//    private void evaluateDealerHand() { //wrong PP totalSum
+//        String player1EvalString;
+//        String player2EvalString;
+//        String player1PPString;
+//        String player2PPString;
+//
+//        ThreeCardLogic threeCardLogic = new ThreeCardLogic();
+//        String wager = "0";
+//
+//        animateCardDeal(deckCardImage, dealerCard1Image, "/deckOfCards/" + dealer.getHand().get(0) + ".png", 0);
+//        animateCardDeal(deckCardImage, dealerCard2Image, "/deckOfCards/" + dealer.getHand().get(1) + ".png", 0);
+//        animateCardDeal(deckCardImage, dealerCard3Image, "/deckOfCards/" + dealer.getHand().get(2) + ".png", 0);
+//        threeCardLogic.callSort(dealer.getHand());
+////        for (Card card : dealer.getHand()) {
+////            System.out.println(card);
+////        }
+////        System.out.println(dealer.getTheDeck().size());
+//        if (dealer.getHand().get(0).getValue() < 12) {
+////            if (!player1Folded) {
+////                p1NextHand = true;
+////            }
+////            if (!player2Folded) {
+////                p2NextHand = true;
+////            }
+//
+////            System.out.println("dealer less than queen");
+//            // Dealer does not qualify, return play wagers and push ante bets
+//            if (!player1Folded) {
+//
+//                if (threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet()) != 0) {
+//                    showInfo("Player 1 wins Pair Plus"); // here
+//                }
+//                else if (player1.getPairPlusBet() != 0){
+//                    showInfo("Player 1 loses Pair Plus"); // here
+//                }
+//                setTotalWinnings(player2Winnings, String.valueOf(threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet())), player1);
+//                String playWager = playWagerInfo.getText().replace("PLAY WAGER: ", "");
+//                setTotalWinnings(player1Winnings, playWager, player1);
+//                setPlayWager(wager);
+//                showInfo("Dealer does not qualify. Player 1's play wager is returned, and the ante is pushed."); // here
+//            }
+//            if (!player2Folded) {
+//                if (threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet()) != 0) {
+//                    showInfo("Player 2 wins Pair Plus"); // here
+//                }
+//                else if (player2.getPairPlusBet() != 0){
+//                    showInfo("Player 2 loses Pair Plus"); // here
+//                }
+//                setTotalWinnings(player2Winnings, String.valueOf(threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet())), player2);
+//                String playWager2 = playWagerInfo2.getText().replace("PLAY WAGER: ", "");
+//                setTotalWinnings(player2Winnings, playWager2, player2);
+//                setPlayer2PlayWager(wager);
+//                showInfo("Dealer does not qualify. Player 2's play wager is returned, and the ante is pushed."); // here
+//            }
+////            dealCards();
+//        }
+//        else {
+//            p1NextHand = false;
+//            p2NextHand = false;
+//            int p1Result;
+//            int p2Result;
+//            int combo = 0;
+//
+//            if (!player1Folded) {
+//                if (threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet()) != 0) {
+//                    showInfo("Player 1 wins Pair Plus"); // here
+//                }
+//                else if (player1.getPairPlusBet() != 0){
+//                    showInfo("Player 1 loses Pair Plus"); // here
+//                }
+//
+//
+//                p1Result = threeCardLogic.compareHands(dealer.getHand(), player1.getHand());
+//                System.out.println(combo + "before adding ante and play bet x2");
+//                combo = (player1.getAnteBet() + player1.getPlayBet()) * 2;
+//                System.out.println(combo + "after adding ante and play bet x2");
+//                combo += threeCardLogic.evalPPWinnings(player1.getHand(), player1.getPairPlusBet());
+//                System.out.println(combo + "after adding PP");
+//                if (p1Result == 1) {
+////                    if (player1.getPairPlusBet() != 0) {
+////                        player1PPString = "Player 1 loses Pair Plus";
+////                        showInfo(player1PPString); // here
+////                    }
+//                    player1EvalString = "Player 1 loses to dealer";
+//                    showInfo(player1EvalString); // here
+//                    setAnteWager(wager);
+//                    setPairPlusWager(wager);
+//                    setPlayWager(wager);
+//                }
+//                else if (p1Result == 2) {
+////                    if (player1.getPairPlusBet() != 0) {
+////                        player1PPString = "Player 1 wins Pair Plus";
+////                        showInfo(player1PPString); // here
+////                    }
+//                    player1EvalString = "Player 1 beats dealer";
+//                    showInfo(player1EvalString); // here
+//                    setAnteWager(wager);
+//                    setPairPlusWager(wager);
+//                    setPlayWager(wager);
+//                    setTotalWinnings(player1Winnings, String.valueOf(combo), player1);
+//                }
+//                else if (p1Result == 0) {
+////                    p1NextHand = true;
+//                    player1EvalString = "Player 1 ties dealer";
+//                    showInfo(player1EvalString); // here
+//                }
+//            }
+//            if (!player2Folded) {
+//                if (threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet()) != 0) {
+//                    showInfo("Player 2 wins Pair Plus"); // here
+//                }
+//                else if (player2.getPairPlusBet() != 0){
+//                    showInfo("Player 2 loses Pair Plus"); // here
+//                }
+//
+//
+//                p2Result = threeCardLogic.compareHands(dealer.getHand(), player2.getHand());
+//                System.out.println(combo + "before adding ante and play bet x2");
+//                combo = (player2.getAnteBet() + player2.getPlayBet()) * 2;
+//                System.out.println(combo + "after adding ante and play bet x2");
+//                combo += threeCardLogic.evalPPWinnings(player2.getHand(), player2.getPairPlusBet());
+//                System.out.println(combo + "after adding PP");
+//
+//                if (p2Result == 1) {
+////                    if (player2.getPairPlusBet() != 0) {
+////                        player2PPString = "Player 2 loses Pair Plus";
+////                        showInfo(player2PPString); // here
+////                    }
+//                    player2EvalString = "Player 2 loses to dealer";
+//                    showInfo(player2EvalString); // here
+//                    setPlayer2AnteWager(wager);
+//                    setPlayer2PairPlusWager(wager);
+//                    setPlayer2PlayWager(wager);
+//                }
+//                else if (p2Result == 2) {
+////                    if (player2.getPairPlusBet() != 0) {
+////                        player2PPString = "Player 2 wins Pair Plus";
+////                        showInfo(player2PPString); // here
+////                    }
+//                    player2EvalString = "Player 2 beats dealer";
+//                    showInfo(player2EvalString); // here
+//                    setPlayer2AnteWager(wager);
+//                    setPlayer2PairPlusWager(wager);
+//                    setPlayer2PlayWager(wager);
+//                    setTotalWinnings(player2Winnings, String.valueOf(combo), player2);
+//                }
+//                else if (p2Result == 0) {
+////                    p2NextHand = true;
+//                    player2EvalString = "Player 2 ties dealer";
+//                    showInfo(player2EvalString); // here
+//                }
+//
+//            }
+//
+//            // Dealer qualifies, continue with game logic
+//            // TODO: Implement further game logic to compare hands and determine winners/losers
+//
+//        }
+//        showInfo("Press Place Bets button in top left to start new hand"); // here
+//
+//    }
 
     @FXML
     private void setupCardImage(ImageView imageView, String imagePath) {
@@ -624,5 +725,17 @@ public class GameScreenController {
         PauseTransition pause = new PauseTransition(Duration.seconds(delayInSeconds));
         pause.setOnFinished(event -> showInfo(message));
         pause.play();
+    }
+
+    private void resetWagers1() {
+        setAnteWager("0");
+        setPairPlusWager("0");
+        setPlayWager("0");
+    }
+
+    private void resetWagers2() {
+        setPlayer2AnteWager("0");
+        setPlayer2PairPlusWager("0");
+        setPlayWager("0");
     }
 }
