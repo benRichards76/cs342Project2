@@ -21,6 +21,7 @@ import java.util.Optional;
 import main.java.Dealer;
 import main.java.Player;
 import main.java.Card;
+import main.java.ThreeCardLogic;
 
 public class GameScreenController {
 
@@ -38,6 +39,11 @@ public class GameScreenController {
     private boolean betsPlaced = false;
     private boolean player1Folded = false;
     private boolean player2Folded = false;
+    private boolean player1Played = false;
+    private boolean player2Played = false;
+    private int currentWinnings = 0;
+    private int playWagerAmount = 0;
+    private int updatedWinnings = 0;
 
     // Player and Dealer instances
     private Player player1;
@@ -169,6 +175,7 @@ public class GameScreenController {
         player1FoldButton.setDisable(true);
         player1PlayBetButton.setDisable(true);
         showInfo("Player 1 has folded.");
+        checkAllActionsCompleted();
     }
 
     @FXML
@@ -180,6 +187,7 @@ public class GameScreenController {
         player2FoldButton.setDisable(true);
         player2PlayBetButton.setDisable(true);
         showInfo("Player 2 has folded.");
+        checkAllActionsCompleted();
     }
 
     @FXML
@@ -194,7 +202,9 @@ public class GameScreenController {
         setPlayWager(anteWager);
         player1FoldButton.setDisable(true);
         player1PlayBetButton.setDisable(true);
+        player1Played = true;
         showInfo("Player 1's play wager has been set to the ante wager: " + anteWager);
+        checkAllActionsCompleted();
     }
 
     @FXML
@@ -209,7 +219,15 @@ public class GameScreenController {
         setPlayer2PlayWager(anteWager);
         player2FoldButton.setDisable(true);
         player2PlayBetButton.setDisable(true);
+        player2Played = true;
         showInfo("Player 2's play wager has been set to the ante wager: " + anteWager);
+        checkAllActionsCompleted();
+    }
+
+    private void checkAllActionsCompleted() {
+        if ((player1Folded || player1Played) && (player2Folded || player2Played)) {
+            evaluateDealerHand();
+        }
     }
 
     private boolean isValidWager(String wager, int min, int max) {
@@ -229,6 +247,9 @@ public class GameScreenController {
 
         // Re-deal hands for each new round
         dealer.setHand(dealer.dealHand());
+        for (Card card : dealer.getHand()) {
+            System.out.println(card.getValue());
+        }
         if (!player1Folded) {
             player1.setHand(dealer.dealHand());
         }
@@ -253,6 +274,77 @@ public class GameScreenController {
             animateCardDeal(deckCardImage, dealerCard3Image, "/deckOfCards/BackOfCard.png", 4000);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void evaluateDealerHand() {
+        String player1EvalString;
+        String player2EvalString;
+        String player1PPString;
+        String player2PPString;
+
+        ThreeCardLogic threeCardLogic = new ThreeCardLogic();
+        String wager = "0";
+
+        animateCardDeal(deckCardImage, dealerCard1Image, "/deckOfCards/" + dealer.getHand().get(0) + ".png", 1000);
+        animateCardDeal(deckCardImage, dealerCard2Image, "/deckOfCards/" + dealer.getHand().get(1) + ".png", 2500);
+        animateCardDeal(deckCardImage, dealerCard3Image, "/deckOfCards/" + dealer.getHand().get(2) + ".png", 4000);
+        threeCardLogic.callSort(dealer.getHand());
+        for (Card card : dealer.getHand()) {
+            System.out.println(card.getValue());
+        }
+        System.out.println(dealer.getTheDeck().size());
+        if (dealer.getHand().get(0).getValue() < 12) {
+
+            System.out.println("dealer less than queen");
+            // Dealer does not qualify, return play wagers and push ante bets
+            if (!player1Folded) {
+                String playWager = playWagerInfo.getText().replace("PLAY WAGER: ", "");
+                setTotalWinnings(player1Winnings, playWager, player1);
+                setPlayWager(wager);
+                showInfo("Dealer does not qualify. Player 1's play wager is returned, and the ante is pushed.");
+            }
+            if (!player2Folded) {
+                String playWager2 = playWagerInfo2.getText().replace("PLAY WAGER: ", "");
+                setTotalWinnings(player2Winnings, playWager2, player2);
+                setPlayer2PlayWager(wager);
+                showInfo("Dealer does not qualify. Player 2's play wager is returned, and the ante is pushed.");
+            }
+            dealCards();
+        } else {
+            int p1Result;
+            int p2Result;
+            int combo = 0;
+
+            if (!player1Folded) {
+                p1Result = threeCardLogic.compareHands(dealer.getHand(), player1.getHand());
+                combo = (player1.getAnteBet() + player1.getPlayBet()) * 2;
+
+                if (p1Result == 1) {
+                    if (player1.getPairPlusBet() != 0) {
+                        player1PPString = "Player 1 loses Pair Plus";
+                        showInfo(player1PPString);
+                    }
+                    player1EvalString = "Player 1 loses to dealer";
+                    showInfo(player1EvalString);
+                    setAnteWager(wager);
+                    setPairPlusWager(wager);
+                }
+                else if (p1Result == 2) {
+                    if (player1.getPairPlusBet() != 0) {
+                        player1PPString = "Player 1 wins Pair Plus";
+                        showInfo(player1PPString);
+                    }
+                    player1EvalString = "Player 1 loses to dealer";
+                    showInfo(player1EvalString);
+                    setAnteWager(wager);
+                    setPairPlusWager(wager);
+                    setTotalWinnings(player1Winnings, String.valueOf(combo), player1);
+                }
+            }
+            p2Result = threeCardLogic.compareHands(dealer.getHand(), player2.getHand());
+            // Dealer qualifies, continue with game logic
+            // TODO: Implement further game logic to compare hands and determine winners/losers
         }
     }
 
@@ -335,6 +427,8 @@ public class GameScreenController {
         // Reset game state if necessary
         player1Folded = false;
         player2Folded = false;
+        player1Played = false;
+        player2Played = false;
         betsPlaced = false;
         player1FoldButton.setDisable(true);
         player2FoldButton.setDisable(true);
@@ -364,31 +458,51 @@ public class GameScreenController {
 
     // Set Player 1's Ante wager value
     public void setAnteWager(String wager) {
+        int p1Ante = Integer.parseInt(wager);
+        player1.setAnteBet(p1Ante);
         anteInfo.setText("ANTE: " + wager);
     }
 
     // Set Player 1's Pair Plus wager value
     public void setPairPlusWager(String wager) {
+        int p1Pair = Integer.parseInt(wager);
+        player1.setPairPlusBet(p1Pair);
         pairPlusInfo.setText("PAIR PLUS: " + wager);
     }
 
     // Set Player 1's Play wager value
     public void setPlayWager(String wager) {
+        int p1Play = Integer.parseInt(wager);
+        player1.setPlayBet(p1Play);
         playWagerInfo.setText("PLAY WAGER: " + wager);
     }
 
     // Set Player 2's Ante wager value
     public void setPlayer2AnteWager(String wager) {
+        int p2Ante = Integer.parseInt(wager);
+        player2.setAnteBet(p2Ante);
         anteInfo2.setText("ANTE: " + wager);
     }
 
     // Set Player 2's Pair Plus wager value
     public void setPlayer2PairPlusWager(String wager) {
+        int p2Pair = Integer.parseInt(wager);
+        player2.setPairPlusBet(p2Pair);
         pairPlusInfo2.setText("PAIR PLUS: " + wager);
     }
 
     // Set Player 2's Play wager value
     public void setPlayer2PlayWager(String wager) {
+        int p2Play = Integer.parseInt(wager);
+        player2.setPlayBet(p2Play);
         playWagerInfo2.setText("PLAY WAGER: " + wager);
+    }
+
+    public void setTotalWinnings(Text playerWinningsText, String wager, Player player) {
+        currentWinnings += Integer.parseInt(playerWinningsText.getText().replace("Total Winnings: $", ""));
+        playWagerAmount += Integer.parseInt(wager);
+        updatedWinnings += currentWinnings + playWagerAmount;
+        player.addWinnings(updatedWinnings);
+        playerWinningsText.setText("Total Winnings: $" + updatedWinnings);
     }
 }
