@@ -1,4 +1,4 @@
-package GameLogic;
+package main.java;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,7 +95,10 @@ public class ThreeCardLogic {
             return 1;
         }
 
-
         return 2;
+    }
+
+    public void callSort(ArrayList<Card> hand) {
+        sortCardsByRank(hand);
     }
 }
